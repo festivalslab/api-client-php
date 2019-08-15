@@ -1,0 +1,38 @@
+{
+  "name": "festivalslab/api-client-php",
+  "description": "PHP client for the Edinburgh Festivals Listings API",
+  "homepage": "https://github.com/festivalslab/api-client-php",
+  "type": "library",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Festivals Edinburgh Listings API",
+      "email": "support@edinburghfestivalcity.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^6.0",
+    "php": "^7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.0",
+    "johnkary/phpunit-speedtrap": "^3.0"
+  },
+  "support": {
+    "source": "https://github.com/festivalslab/api-client-php",
+    "issues": "https://github.com/festivalslab/api-client-php/issues"
+  },
+  "autoload": {
+    "psr-4": {
+      "FestivalsApi\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "test\\unit\\FestivalsApi\\": "test"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}
