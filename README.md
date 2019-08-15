@@ -5,6 +5,8 @@ The Edinburgh Festivals Listings API client for PHP makes it easy for developers
 
 You can get started quickly by [installing the client through composer](#installing)
 
+[![Build Status](https://travis-ci.org/festivalslab/api-client-php.svg?branch=1.0.x)](https://travis-ci.org/festivalslab/api-client-php)
+
 ## Quick Examples
 
 #### Create a client
