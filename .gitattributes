@@ -30,4 +30,6 @@ README  text eol=lf
 
 # Ignore paths that should not be included in an archive (eg for a distribution version)
 /test export-ignore
+phpunit.xml export-ignore
+.travis.yml export-ignore
 src/ClientVersion.php export-subst

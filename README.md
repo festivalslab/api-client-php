@@ -38,11 +38,16 @@ Using `FestivalsApi\FestivalsApiEventSearch` will take care for the pagination f
 
 ```php
 use FestivalsApi\EventSearchIterator;
+use FestivalsApi\FestivalsApiClientException;
 
 $search = new EventSearchIterator($client);
 $search->setQuery(['festival' => 'jazz']);
-foreach ($search as $event){
-    echo $event['title'];
+try {
+    foreach ($search as $event){
+        echo $event['title'];
+    }
+} catch (FestivalsApiClientException $e){
+    echo "There was an error: " . $e->getMessage();
 }
 ```
 
