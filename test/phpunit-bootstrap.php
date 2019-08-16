@@ -8,8 +8,3 @@ set_error_handler(
         throw new ErrorException($message, 0, $severity, $file, $line);
     }
 );
-
-// Autoload mocks and test-support helpers that should not autoload in the main app
-$mock_loader = new \Composer\Autoload\ClassLoader;
-$mock_loader->addPsr4('test\\mock\\FestivalsApi\\', [__DIR__.'/mock']);
-$mock_loader->register();
