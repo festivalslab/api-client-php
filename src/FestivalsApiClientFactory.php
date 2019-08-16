@@ -14,7 +14,8 @@ class FestivalsApiClientFactory
 {
     public static function create(): FestivalsApiClient
     {
-        $guzzle = new Client(['headers' => ['User-Agent' => 'Festivals API Client (PHP)']]);
+        $user_agent = 'Festivals API Client (PHP) '.require(__DIR__.'/ClientVersion.php');
+        $guzzle     = new Client(['headers' => ['User-Agent' => $user_agent]]);
 
         return new FestivalsApiClient($guzzle);
     }

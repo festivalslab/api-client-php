@@ -30,3 +30,4 @@ README  text eol=lf
 
 # Ignore paths that should not be included in an archive (eg for a distribution version)
 /test export-ignore
+src/ClientVersion.php export-subst
