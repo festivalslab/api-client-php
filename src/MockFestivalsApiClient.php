@@ -4,7 +4,7 @@
  * @licence   BSD-3-Clause
  */
 
-namespace test\mock\FestivalsApi;
+namespace FestivalsApi;
 
 use Exception;
 use FestivalsApi\FestivalsApiClient;

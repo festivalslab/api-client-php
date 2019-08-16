@@ -10,7 +10,7 @@ use FestivalsApi\EventSearchIterator;
 use IteratorAggregate;
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use test\mock\FestivalsApi\MockFestivalsApiClient;
+use FestivalsApi\MockFestivalsApiClient;
 use function iterator_count;
 use function iterator_to_array;
 
