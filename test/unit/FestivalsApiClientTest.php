@@ -62,28 +62,51 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    public function test_setting_base_url_overrides_default()
+    public function provider_constructor_base_urls()
     {
-        $this->mockGuzzleWithResponses(
-            [
-                new Response(200, [], "[]"),
-                new Response(200, [], "[]"),
-            ]
-        );
+        return [
+            ['http://example.test', 'http://example.test'],
+            ['http://example.test/', 'http://example.test'],
+            ['https://example.test/', 'https://example.test'],
+            // The testcase calls the constructor differently to skip this optional arg and test the default
+            [NULL, FestivalsApiClient::BASE_URL],
+        ];
+    }
 
-        $subject = $this->newSubjectWithValidCredentials();
-
+    /**
+     * @dataProvider provider_constructor_base_urls
+     */
+    public function test_it_uses_default_base_url_or_can_be_configured_with_custom_and_strips_trailing_slash_if_any(
+        $base_url,
+        $expect_scheme_host
+    ) {
+        $this->mockGuzzleWithEmptySuccessResponse();
+        if ($base_url === NULL) {
+            $subject = new FestivalsApiClient($this->guzzle);
+        } else {
+            $subject = new FestivalsApiClient($this->guzzle, $base_url);
+        }
+        $subject->setCredentials('mykey', 'mysecret');
         $subject->searchEvents([]);
         $this->assertSame(
-            'https://api.edinburghfestivalcity.com/events?key=test-key&signature=7793ae3038669f76de954f197f1818727a12a037',
+            $expect_scheme_host.'/events?key=mykey&signature=9c638d91ba50f39da6ecc1d4e8846ae30c318f55',
             (string) $this->getRequest(0)->getUri()
         );
+    }
 
-        $subject->setBaseUrl('http://example.test');
+    /**
+     * @dataProvider provider_constructor_base_urls
+     */
+    public function test_its_base_url_can_be_customised_after_construction_and_strips_trailing_slash(
+        $base_url,
+        $expect_scheme_host
+    ) {
+        $subject = $this->newSubjectWithValidCredentials();
+        $subject->setBaseUrl($base_url ?: FestivalsApiClient::BASE_URL);
         $subject->searchEvents([]);
         $this->assertSame(
-            'http://example.test/events?key=test-key&signature=7793ae3038669f76de954f197f1818727a12a037',
-            (string) $this->getRequest(1)->getUri()
+            $expect_scheme_host.'/events?key=test-key&signature=7793ae3038669f76de954f197f1818727a12a037',
+            (string) $this->getRequest(0)->getUri()
         );
     }
 
