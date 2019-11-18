@@ -52,8 +52,8 @@ class FestivalsApiClientTest extends TestCase
 
     public function test_it_performs_requests_with_initialised_key_and_secret()
     {
-        $this->response_queue = [new Response(200, [], "[]")];
-        $subject              = $this->newSubject();
+        $this->mockGuzzleWithEmptySuccessResponse();
+        $subject = $this->newSubject();
         $subject->setCredentials('mykey', 'mysecret');
         $subject->searchEvents([]);
         $this->assertSame(
@@ -64,10 +64,12 @@ class FestivalsApiClientTest extends TestCase
 
     public function test_setting_base_url_overrides_default()
     {
-        $this->response_queue = [
-            new Response(200, [], "[]"),
-            new Response(200, [], "[]"),
-        ];
+        $this->mockGuzzleWithResponses(
+            [
+                new Response(200, [], "[]"),
+                new Response(200, [], "[]"),
+            ]
+        );
 
         $subject = $this->newSubjectWithValidCredentials();
 
@@ -87,8 +89,8 @@ class FestivalsApiClientTest extends TestCase
 
     public function test_it_calls_the_api_with_the_event_id_specified()
     {
-        $this->response_queue = [new Response(200, [], "[]")];
-        $subject              = $this->newSubjectWithValidCredentials();
+        $this->mockGuzzleWithEmptySuccessResponse();
+        $subject = $this->newSubjectWithValidCredentials();
 
         $result = $subject->loadEvent('1234');
 
@@ -104,8 +106,8 @@ class FestivalsApiClientTest extends TestCase
 
     public function test_load_event_returns_single_event_from_response()
     {
-        $this->response_queue = [new Response(200, [], '{"title": "Foo Bar", "id":4321}')];
-        $subject              = $this->newSubjectWithValidCredentials();
+        $this->mockGuzzleWithResponse(new Response(200, [], '{"title": "Foo Bar", "id":4321}'));
+        $subject = $this->newSubjectWithValidCredentials();
         $this->assertEquals($subject->loadEvent('4321')->getEvent(), ['title' => 'Foo Bar', 'id' => 4321]);
     }
 
@@ -118,8 +120,8 @@ class FestivalsApiClientTest extends TestCase
      */
     public function test_it_correctly_url_encodes_search_query($query, $expected)
     {
-        $this->response_queue = [new Response(200, [], "[]")];
-        $subject              = $this->newSubjectWithValidCredentials();
+        $this->mockGuzzleWithEmptySuccessResponse();
+        $subject = $this->newSubjectWithValidCredentials();
 
         $result = $subject->searchEvents($query);
 
@@ -140,21 +142,21 @@ class FestivalsApiClientTest extends TestCase
      */
     public function test_event_search_result_holds_total_result_count_from_header($headers, $expected)
     {
-        $this->response_queue = [new Response(200, $headers, "[]")];
-        $subject              = $this->newSubjectWithValidCredentials();
-        $result               = $subject->searchEvents([]);
+        $this->mockGuzzleWithResponse(new Response(200, $headers, "[]"));
+        $subject = $this->newSubjectWithValidCredentials();
+        $result  = $subject->searchEvents([]);
         $this->assertEquals($expected, $result->getTotalResults());
     }
 
     public function test_search_event_returns_events_from_response()
     {
-        $this->response_queue = [
+        $this->mockGuzzleWithResponse(
             new Response(
                 200,
                 [],
                 '[{"title": "Test event 1", "id":101},{"title": "Test event 2", "id":102}]'
-            ),
-        ];
+            )
+        );
 
         $subject = $this->newSubjectWithValidCredentials();
         $this->assertEquals(
@@ -180,8 +182,8 @@ class FestivalsApiClientTest extends TestCase
      */
     public function test_it_throws_if_api_responds_with_error($code, $body, $exception_message)
     {
-        $this->response_queue = [new Response($code, [], $body)];
-        $subject              = $this->newSubjectWithValidCredentials();
+        $this->mockGuzzleWithResponse(new Response($code, [], $body));
+        $subject = $this->newSubjectWithValidCredentials();
 
         $this->expectException(FestivalsApiClientException::class);
         $this->expectExceptionMessage($exception_message);
@@ -190,8 +192,8 @@ class FestivalsApiClientTest extends TestCase
 
     public function test_client_exception_contains_url_requested()
     {
-        $this->response_queue = [new Response(404, [], '{"error":"Something went wrong"}')];
-        $subject              = $this->newSubjectWithValidCredentials();
+        $this->mockGuzzleWithResponse(new Response(404, [], '{"error":"Something went wrong"}'));
+        $subject = $this->newSubjectWithValidCredentials();
         try {
             $subject->searchEvents([]);
         } catch (FestivalsApiClientException $e) {
@@ -203,19 +205,37 @@ class FestivalsApiClientTest extends TestCase
         }
     }
 
+    protected function mockGuzzleWithEmptySuccessResponse()
+    {
+        $this->mockGuzzleWithResponses([new Response(200, [], "[]")]);
+    }
+
+    protected function mockGuzzleWithResponse(Response $response)
+    {
+        $this->mockGuzzleWithResponses([$response]);
+    }
+
+    protected function mockGuzzleWithResponses(array $responses)
+    {
+        $mock    = new MockHandler($responses);
+        $handler = HandlerStack::create($mock);
+        $history = Middleware::history($this->history);
+        $handler->push($history);
+
+        $this->guzzle = new Client(['handler' => $handler]);
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->mockGuzzleWithEmptySuccessResponse();
+    }
+
     /**
      * @return FestivalsApiClient
      */
     protected function newSubject()
     {
-        $mock    = new MockHandler($this->response_queue);
-        $handler = HandlerStack::create($mock);
-
-        $history = Middleware::history($this->history);
-        $handler->push($history);
-
-        $this->guzzle = new Client(['handler' => $handler]);
-
         return new FestivalsApiClient($this->guzzle);
     }
 
