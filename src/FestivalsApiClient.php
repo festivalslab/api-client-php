@@ -49,7 +49,7 @@ class FestivalsApiClient
     public function __construct(Client $guzzle, $base_url = self::BASE_URL)
     {
         $this->guzzle   = $guzzle;
-        $this->base_url = $base_url;
+        $this->setBaseUrl($base_url);
     }
 
     /**
@@ -103,7 +103,7 @@ class FestivalsApiClient
      */
     public function setBaseUrl(string $base_url): void
     {
-        $this->base_url = $base_url;
+        $this->base_url = rtrim($base_url, '/');
     }
 
     /**
