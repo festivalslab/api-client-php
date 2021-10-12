@@ -27,11 +27,6 @@
       "FestivalsApi\\": "src/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "test\\unit\\FestivalsApi\\": "test"
-    }
-  },
   "config": {
     "preferred-install": "dist"
   }
