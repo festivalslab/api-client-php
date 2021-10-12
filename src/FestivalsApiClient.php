@@ -22,31 +22,15 @@ class FestivalsApiClient
     const BASE_URL        = 'https://api.edinburghfestivalcity.com';
     const EVENTS_ENDPOINT = '/events';
 
-    /**
-     * @var string
-     */
-    protected $access_key;
+    protected string $access_key;
 
-    /**
-     * @var string
-     */
-    protected $base_url;
+    protected string $base_url;
 
-    /**
-     * @var Client
-     */
-    protected $guzzle;
+    protected Client $guzzle;
 
-    /**
-     * @var string
-     */
-    protected $secret;
+    protected string $secret;
 
-    /**
-     * @param Client $guzzle
-     * @param string $base_url
-     */
-    public function __construct(Client $guzzle, $base_url = self::BASE_URL)
+    public function __construct(Client $guzzle, string $base_url = self::BASE_URL)
     {
         $this->guzzle   = $guzzle;
         $this->setBaseUrl($base_url);
@@ -55,9 +39,6 @@ class FestivalsApiClient
     /**
      * Load a single event by ID or throw if not found
      *
-     * @param string $id
-     *
-     * @return SingleEventResult
      * @throws GuzzleException
      * @throws FestivalsApiClientException if event not found
      */
@@ -75,9 +56,6 @@ class FestivalsApiClient
     /**
      * Search API for events matching query
      *
-     * @param array $query
-     *
-     * @return EventSearchResult
      * @throws FestivalsApiClientException
      * @throws GuzzleException
      */
@@ -98,29 +76,17 @@ class FestivalsApiClient
         return new EventSearchResult($events, (string) $request->getUri(), $total_results);
     }
 
-    /**
-     * @param string $base_url
-     */
     public function setBaseUrl(string $base_url): void
     {
         $this->base_url = rtrim($base_url, '/');
     }
 
-    /**
-     * @param string $access_key
-     * @param string $secret
-     */
     public function setCredentials(string $access_key, string $secret): void
     {
         $this->access_key = $access_key;
         $this->secret     = $secret;
     }
 
-    /**
-     * @param string $url
-     *
-     * @return Request
-     */
     protected function createRequest(string $url): Request
     {
         $full_url = $this->base_url.$this->getSignedUrl($url);
@@ -129,12 +95,6 @@ class FestivalsApiClient
         return $request;
     }
 
-    /**
-     * @param ResponseInterface $response
-     *
-     * @return array
-     * @throws FestivalsApiClientException if JSON decode failed
-     */
     protected function decodeJsonResponse(ResponseInterface $response): array
     {
         try {
@@ -144,13 +104,6 @@ class FestivalsApiClient
         }
     }
 
-    /**
-     * Get signature for $data string
-     *
-     * @param string $data
-     *
-     * @return string
-     */
     protected function getSignature(string $data): string
     {
         return hash_hmac('sha1', $data, $this->secret);
@@ -158,10 +111,6 @@ class FestivalsApiClient
 
     /**
      * Calculate signature and append it to the URL
-     *
-     * @param string $url
-     *
-     * @return string
      */
     protected function getSignedUrl(string $url): string
     {
@@ -177,11 +126,9 @@ class FestivalsApiClient
     }
 
     /**
-     * @param BadResponseException $e
-     *
      * @throws FestivalsApiClientException
      */
-    protected function handleApiError($e): void
+    protected function handleApiError(BadResponseException $e): void
     {
         $msg  = $e->getResponse()->getBody();
         $code = $e->getResponse()->getStatusCode();
@@ -200,10 +147,6 @@ class FestivalsApiClient
     }
 
     /**
-     * @param Request $request
-     *
-     * @return ResponseInterface
-     *
      * @throws GuzzleException
      * @throws FestivalsApiClientException
      */

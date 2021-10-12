@@ -16,10 +16,7 @@ use function iterator_to_array;
 
 class EventSearchIteratorTest extends TestCase
 {
-    /**
-     * @var MockFestivalsApiClient
-     */
-    protected $client;
+    protected MockFestivalsApiClient $client;
 
     public function test_it_is_initialisable()
     {
@@ -125,7 +122,7 @@ class EventSearchIteratorTest extends TestCase
         $this->assertEquals($expected, iterator_to_array($subject));
     }
 
-    public function result_order_dataprovider()
+    public function result_order_dataprovider(): array
     {
         return [
             //no results
@@ -171,7 +168,7 @@ class EventSearchIteratorTest extends TestCase
         );
     }
 
-    protected function newSubject()
+    protected function newSubject(): EventSearchIterator
     {
         return new EventSearchIterator($this->client);
     }

@@ -12,23 +12,17 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 class FestivalsApiClientTest extends TestCase
 {
-    /** @var Client */
-    protected $guzzle;
+    protected Client $guzzle;
 
-    /**
-     * @var array
-     */
-    protected $history = [];
+    protected array $history = [];
 
-    /**
-     * @var array
-     */
-    protected $response_queue = [];
+    protected array $response_queue = [];
 
     public function test_it_is_initialisable()
     {
@@ -38,11 +32,8 @@ class FestivalsApiClientTest extends TestCase
     /**
      * @testWith ["loadEvent", 1234]
      *           ["searchEvents", {"title": "Foo"}]
-     *
-     * @param string $method
-     * @param mixed  $args
      */
-    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials($method, $args)
+    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials(string $method, $args)
     {
         $subject = $this->newSubject();
         $this->expectException(FestivalsApiClientException::class);
@@ -62,7 +53,7 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    public function provider_constructor_base_urls()
+    public function provider_constructor_base_urls(): array
     {
         return [
             ['http://example.test', 'http://example.test'],
@@ -137,11 +128,8 @@ class FestivalsApiClientTest extends TestCase
     /**
      * @testWith [{"title": "\"Foo Bar\""}, "title=%22Foo+Bar%22&key=test-key&signature=b313169e84c3922f07c6010e2191486a5192c039"]
      *           [{"artist": "Amélie"}, "artist=Am%C3%A9lie&key=test-key&signature=6fdb17738b2fcb841105585fa02c8052075c3d89"]
-     *
-     * @param array  $query
-     * @param string $expected
      */
-    public function test_it_correctly_url_encodes_search_query($query, $expected)
+    public function test_it_correctly_url_encodes_search_query(array $query, string $expected)
     {
         $this->mockGuzzleWithEmptySuccessResponse();
         $subject = $this->newSubjectWithValidCredentials();
@@ -159,11 +147,8 @@ class FestivalsApiClientTest extends TestCase
      * @testWith [{}, 0]
      *           [{"x-total-results": 1021}, 1021]
      *           [{"x-total-results": 0}, 0]
-     *
-     * @param array $headers
-     * @param int   $expected
      */
-    public function test_event_search_result_holds_total_result_count_from_header($headers, $expected)
+    public function test_event_search_result_holds_total_result_count_from_header(array $headers, int $expected)
     {
         $this->mockGuzzleWithResponse(new Response(200, $headers, "[]"));
         $subject = $this->newSubjectWithValidCredentials();
@@ -199,11 +184,8 @@ class FestivalsApiClientTest extends TestCase
      *           [403, "Forbidden", "Forbidden"]
      *           [500, "Server Error", "Server Error"]
      *           [501, "<h1>Not Implemented</h1>", "<h1>Not Implemented</h1>"]
-     * @param $code
-     * @param $body
-     * @param $exception_message
      */
-    public function test_it_throws_if_api_responds_with_error($code, $body, $exception_message)
+    public function test_it_throws_if_api_responds_with_error(int $code, string $body, string $exception_message)
     {
         $this->mockGuzzleWithResponse(new Response($code, [], $body));
         $subject = $this->newSubjectWithValidCredentials();
@@ -254,18 +236,12 @@ class FestivalsApiClientTest extends TestCase
         $this->mockGuzzleWithEmptySuccessResponse();
     }
 
-    /**
-     * @return FestivalsApiClient
-     */
-    protected function newSubject()
+    protected function newSubject(): FestivalsApiClient
     {
         return new FestivalsApiClient($this->guzzle);
     }
 
-    /**
-     * @return FestivalsApiClient
-     */
-    protected function newSubjectWithValidCredentials()
+    protected function newSubjectWithValidCredentials(): FestivalsApiClient
     {
         $subject = $this->newSubject();
         $subject->setCredentials('test-key', 'test-secret');
@@ -273,12 +249,7 @@ class FestivalsApiClientTest extends TestCase
         return $subject;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return GuzzleHttp\Psr7\Request
-     */
-    protected function getRequest(int $id)
+    protected function getRequest(int $id): Request
     {
         return $this->history[$id]['request'];
     }
