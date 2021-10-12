@@ -1,5 +1,11 @@
 ### Unreleased
 
+### v2.0.0 (2021-10-12)
+
+* Drop support for php 7.2
+* Support php 7.4 & 8.0
+* Support Guzzle 6 and 7
+
 ### v1.0.1 (2019-11-18)
 
 * Accept (and ignore) a trailing `/` on the API client base url parameter, if provided.

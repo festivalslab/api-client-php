@@ -7,7 +7,6 @@
 namespace FestivalsApi;
 
 use Exception;
-use FestivalsApi\FestivalsApiClient;
 use FestivalsApi\Result\EventSearchResult;
 use FestivalsApi\Result\SingleEventResult;
 use PHPUnit\Framework\Assert;
@@ -17,33 +16,19 @@ use function count;
 
 class MockFestivalsApiClient extends FestivalsApiClient
 {
-    /**
-     * @var array
-     */
-    protected $called_with = [];
 
-    /**
-     * @var array
-     */
-    protected $responses = [];
+    protected array $called_with = [];
 
-    /**
-     * @var int
-     */
-    protected $total_results;
+    protected array $responses = [];
+
+    protected int $total_results = 0;
 
     public function __construct()
     {
         //do nothing
     }
 
-    /**
-     * @param array $array
-     * @param int   $total_results
-     *
-     * @return MockFestivalsApiClient
-     */
-    public static function willReturn(array $array, int $total_results = 0)
+    public static function willReturn(array $array, int $total_results = 0): MockFestivalsApiClient
     {
         $me                = new self;
         $me->responses     = array_reverse($array);
@@ -52,18 +37,12 @@ class MockFestivalsApiClient extends FestivalsApiClient
         return $me;
     }
 
-    /**
-     * @param int $expected
-     */
     public function assertApiCallsCount(int $expected)
     {
         $actual = count($this->called_with);
         Assert::assertEquals($expected, $actual, "API was queried ".$actual." times, expected ".$expected);
     }
 
-    /**
-     * @param $expected
-     */
     public function assertCalledWith($expected)
     {
         Assert::assertSame($expected, $this->called_with);
@@ -74,27 +53,16 @@ class MockFestivalsApiClient extends FestivalsApiClient
         $this->assertApiCallsCount(0);
     }
 
-    /**
-     * @param string $id
-     *
-     * @return SingleEventResult
-     * @throws Exception
-     */
     public function loadEvent(string $id): SingleEventResult
     {
         $this->called_with[] = $id;
         throw new Exception("not implemented yet");
     }
 
-    /**
-     * @param array $query
-     *
-     * @return EventSearchResult
-     */
     public function searchEvents(array $query): EventSearchResult
     {
         $this->called_with[] = $query;
-        $response            = array_pop($this->responses);
+        $response            = array_pop($this->responses) ?: [];
 
         return new EventSearchResult($response, 'WORK IT OUT YOURSELF', $this->total_results);
     }

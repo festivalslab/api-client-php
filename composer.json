@@ -11,12 +11,12 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "^6.0",
-    "php": "^7.2"
+    "guzzlehttp/guzzle": "^6.2 || ^7.0",
+    "php": "^7.4 || ~8.0.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.0",
-    "johnkary/phpunit-speedtrap": "^3.0"
+    "phpunit/phpunit": "^9.5",
+    "johnkary/phpunit-speedtrap": "^3.3"
   },
   "support": {
     "source": "https://github.com/festivalslab/api-client-php",
@@ -25,11 +25,6 @@
   "autoload": {
     "psr-4": {
       "FestivalsApi\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "test\\unit\\FestivalsApi\\": "test"
     }
   },
   "config": {

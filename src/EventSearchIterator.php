@@ -18,42 +18,22 @@ use function is_array;
 
 class EventSearchIterator implements IteratorAggregate
 {
-    /**
-     * @var FestivalsApiClient
-     */
-    protected $client;
+    protected FestivalsApiClient $client;
 
-    /**
-     * @var EventSearchResult
-     */
-    protected $last_result;
+    protected EventSearchResult $last_result;
 
-    /**
-     * @var int
-     */
-    protected $page_size;
+    protected ?int $page_size = NULL;
 
-    /**
-     * @var array
-     */
-    protected $query;
+    protected ?array $query = NULL;
 
-    /**
-     * @var int
-     */
-    protected $request_count = 0;
+    protected int $request_count = 0;
 
-    /**
-     * @param FestivalsApiClient $client
-     */
     public function __construct(FestivalsApiClient $client)
     {
         $this->client = $client;
     }
 
     /**
-     * @return Traversable
-     *
      * @throws FestivalsApiClientException if API client encounters an error
      * @throws GuzzleException if Guzzle encounters an error
      * @throws LogicException if no query set
@@ -75,8 +55,6 @@ class EventSearchIterator implements IteratorAggregate
 
     /**
      * Total number of calls to API made by this query
-     *
-     * @return int
      */
     public function getNoOfRequestsMadeByQuery(): int
     {
@@ -98,8 +76,6 @@ class EventSearchIterator implements IteratorAggregate
 
     /**
      * Execute the query and return the events
-     *
-     * @return array
      *
      * @throws GuzzleException
      * @throws FestivalsApiClientException
