@@ -248,7 +248,7 @@ class FestivalsApiClientTest extends TestCase
         $this->guzzle = new Client(['handler' => $handler]);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockGuzzleWithEmptySuccessResponse();

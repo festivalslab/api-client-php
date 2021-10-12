@@ -176,7 +176,7 @@ class EventSearchIteratorTest extends TestCase
         return new EventSearchIterator($this->client);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->client = new MockFestivalsApiClient();
