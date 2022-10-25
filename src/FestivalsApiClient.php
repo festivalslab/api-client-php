@@ -26,13 +26,10 @@ class FestivalsApiClient
 
     protected string $base_url;
 
-    protected Client $guzzle;
-
     protected string $secret;
 
-    public function __construct(Client $guzzle, string $base_url = self::BASE_URL)
+    public function __construct(protected Client $guzzle, string $base_url = self::BASE_URL)
     {
-        $this->guzzle   = $guzzle;
         $this->setBaseUrl($base_url);
     }
 
@@ -90,9 +87,8 @@ class FestivalsApiClient
     protected function createRequest(string $url): Request
     {
         $full_url = $this->base_url.$this->getSignedUrl($url);
-        $request  = new Request('GET', $full_url);
 
-        return $request;
+        return new Request('GET', $full_url);
     }
 
     protected function decodeJsonResponse(ResponseInterface $response): array
@@ -114,7 +110,7 @@ class FestivalsApiClient
      */
     protected function getSignedUrl(string $url): string
     {
-        if (strpos($url, '?') !== FALSE) {
+        if (str_contains($url, '?')) {
             $url .= '&key='.$this->access_key;
         } else {
             $url .= '?key='.$this->access_key;

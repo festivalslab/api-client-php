@@ -18,7 +18,6 @@ use function is_array;
 
 class EventSearchIterator implements IteratorAggregate
 {
-    protected FestivalsApiClient $client;
 
     protected EventSearchResult $last_result;
 
@@ -28,9 +27,8 @@ class EventSearchIterator implements IteratorAggregate
 
     protected int $request_count = 0;
 
-    public function __construct(FestivalsApiClient $client)
+    public function __construct(protected FestivalsApiClient $client)
     {
-        $this->client = $client;
     }
 
     /**

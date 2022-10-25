@@ -13,17 +13,13 @@ use RuntimeException;
 
 class FestivalsApiClientException extends RuntimeException
 {
-
-    protected ?string $url;
-
     public function __construct(
         string $message,
-        ?int $code = NULL,
-        ?string $url = NULL,
+        int $code = 0,
+        protected ?string $url = NULL,
         ?Exception $previous_exception = NULL
     ) {
         parent::__construct($message, $code, $previous_exception);
-        $this->url = $url;
     }
 
     public static function invalidJsonResponse(int $code, ?Exception $previous_exception = NULL): FestivalsApiClientException
