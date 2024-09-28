@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 class FestivalsApiClientFactoryTest extends TestCase
 {
 
-    public function test_it_creates_client_without_credentials()
+    public function test_it_creates_client_without_credentials(): void
     {
         $this->assertInstanceOf(
             FestivalsApiClient::class,
@@ -21,7 +21,7 @@ class FestivalsApiClientFactoryTest extends TestCase
         );
     }
 
-    public function test_it_creates_client_with_credentials_set()
+    public function test_it_creates_client_with_credentials_set(): void
     {
         $this->assertInstanceOf(
             FestivalsApiClient::class,
