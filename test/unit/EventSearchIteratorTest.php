@@ -7,10 +7,11 @@
 namespace test\unit\FestivalsApi;
 
 use FestivalsApi\EventSearchIterator;
+use FestivalsApi\MockFestivalsApiClient;
 use IteratorAggregate;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use FestivalsApi\MockFestivalsApiClient;
 use function iterator_count;
 use function iterator_to_array;
 
@@ -18,17 +19,17 @@ class EventSearchIteratorTest extends TestCase
 {
     protected MockFestivalsApiClient $client;
 
-    public function test_it_is_initialisable()
+    public function test_it_is_initialisable(): void
     {
         $this->assertInstanceOf(EventSearchIterator::class, $this->newSubject());
     }
 
-    public function test_it_is_an_iterator_aggregate()
+    public function test_it_is_an_iterator_aggregate(): void
     {
         $this->assertInstanceOf(IteratorAggregate::class, $this->newSubject());
     }
 
-    public function test_it_throws_if_no_search_query_set()
+    public function test_it_throws_if_no_search_query_set(): void
     {
         $subject = $this->newSubject();
         $this->expectException(LogicException::class);
@@ -38,21 +39,19 @@ class EventSearchIteratorTest extends TestCase
         iterator_to_array($subject);
     }
 
-    public function test_setting_search_query_makes_no_calls_to_api()
+    public function test_setting_search_query_makes_no_calls_to_api(): void
     {
         $subject = $this->newSubject();
         $subject->setQuery(['festival' => 'jazz']);
         $this->client->assertZeroCallsMade();
     }
 
-    /**
-     * @dataProvider multiple_page_dataprovider
-     *
-     * @param array $client_responses
-     * @param int   $page_size
-     * @param array $expected
-     */
-    public function test_it_iterates_api_until_no_more_events($client_responses, $page_size, $expected)
+    #[DataProvider('multiple_page_dataprovider')]
+    public function test_it_iterates_api_until_no_more_events(
+        array $client_responses,
+        int   $page_size,
+        array $expected
+    ): void
     {
         $this->client = MockFestivalsApiClient::willReturn($client_responses);
 
@@ -65,7 +64,7 @@ class EventSearchIteratorTest extends TestCase
         $this->client->assertCalledWith($expected);
     }
 
-    public function multiple_page_dataprovider()
+    public static function multiple_page_dataprovider(): array
     {
         return [
             //no results
@@ -89,7 +88,7 @@ class EventSearchIteratorTest extends TestCase
         ];
     }
 
-    public function test_searches_with_provided_query_overriding_size_or_from()
+    public function test_searches_with_provided_query_overriding_size_or_from(): void
     {
         $this->client = MockFestivalsApiClient::willReturn([['A', 'B',], ['C', 'D'], []]);
         $subject      = $this->newSubject();
@@ -107,14 +106,12 @@ class EventSearchIteratorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider result_order_dataprovider
-     *
-     * @param array $client_responses
-     * @param int   $page_size
-     * @param array $expected
-     */
-    public function test_it_returns_all_results_in_correct_order($client_responses, $page_size, $expected)
+    #[DataProvider('result_order_dataprovider')]
+    public function test_it_returns_all_results_in_correct_order(
+        array $client_responses,
+        int   $page_size,
+        array $expected
+    ): void
     {
         $this->client = MockFestivalsApiClient::willReturn($client_responses);
         $subject      = $this->newSubject();
@@ -122,7 +119,7 @@ class EventSearchIteratorTest extends TestCase
         $this->assertEquals($expected, iterator_to_array($subject));
     }
 
-    public function result_order_dataprovider(): array
+    public static function result_order_dataprovider(): array
     {
         return [
             //no results
@@ -146,7 +143,7 @@ class EventSearchIteratorTest extends TestCase
         ];
     }
 
-    public function test_it_returns_number_of_calls_to_api_made_per_search_query()
+    public function test_it_returns_number_of_calls_to_api_made_per_search_query(): void
     {
         $this->client = MockFestivalsApiClient::willReturn([['1', '2',], ['3']]);
         $subject      = $this->newSubject();

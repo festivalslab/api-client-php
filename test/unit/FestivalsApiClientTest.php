@@ -14,6 +14,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class FestivalsApiClientTest extends TestCase
@@ -24,16 +26,14 @@ class FestivalsApiClientTest extends TestCase
 
     protected array $response_queue = [];
 
-    public function test_it_is_initialisable()
+    public function test_it_is_initialisable(): void
     {
         $this->assertInstanceOf(FestivalsApiClient::class, $this->newSubject());
     }
 
-    /**
-     * @testWith ["loadEvent", 1234]
-     *           ["searchEvents", {"title": "Foo"}]
-     */
-    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials(string $method, $args)
+    #[TestWith(['loadEvent', 1234])]
+    #[TestWith(['searchEvents', ['title' => 'Foo']])]
+    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials(string $method, $args): void
     {
         $subject = $this->newSubject();
         $this->expectException(FestivalsApiClientException::class);
@@ -41,7 +41,7 @@ class FestivalsApiClientTest extends TestCase
         $subject->$method($args);
     }
 
-    public function test_it_performs_requests_with_initialised_key_and_secret()
+    public function test_it_performs_requests_with_initialised_key_and_secret(): void
     {
         $this->mockGuzzleWithEmptySuccessResponse();
         $subject = $this->newSubject();
@@ -53,7 +53,7 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    public function provider_constructor_base_urls(): array
+    public static function provider_constructor_base_urls(): array
     {
         return [
             ['http://example.test', 'http://example.test'],
@@ -64,13 +64,11 @@ class FestivalsApiClientTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provider_constructor_base_urls
-     */
+    #[DataProvider('provider_constructor_base_urls')]
     public function test_it_uses_default_base_url_or_can_be_configured_with_custom_and_strips_trailing_slash_if_any(
-        $base_url,
-        $expect_scheme_host
-    ) {
+        ?string $base_url,
+        string $expect_scheme_host
+    ): void {
         $this->mockGuzzleWithEmptySuccessResponse();
         if ($base_url === NULL) {
             $subject = new FestivalsApiClient($this->guzzle);
@@ -85,13 +83,11 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provider_constructor_base_urls
-     */
+    #[DataProvider('provider_constructor_base_urls')]
     public function test_its_base_url_can_be_customised_after_construction_and_strips_trailing_slash(
         $base_url,
         $expect_scheme_host
-    ) {
+    ): void {
         $subject = $this->newSubjectWithValidCredentials();
         $subject->setBaseUrl($base_url ?: FestivalsApiClient::BASE_URL);
         $subject->searchEvents([]);
@@ -101,7 +97,7 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    public function test_it_calls_the_api_with_the_event_id_specified()
+    public function test_it_calls_the_api_with_the_event_id_specified(): void
     {
         $this->mockGuzzleWithEmptySuccessResponse();
         $subject = $this->newSubjectWithValidCredentials();
@@ -118,18 +114,16 @@ class FestivalsApiClientTest extends TestCase
         $this->assertEquals($expected, $result->getUrl());
     }
 
-    public function test_load_event_returns_single_event_from_response()
+    public function test_load_event_returns_single_event_from_response(): void
     {
         $this->mockGuzzleWithResponse(new Response(200, [], '{"title": "Foo Bar", "id":4321}'));
         $subject = $this->newSubjectWithValidCredentials();
         $this->assertEquals($subject->loadEvent('4321')->getEvent(), ['title' => 'Foo Bar', 'id' => 4321]);
     }
 
-    /**
-     * @testWith [{"title": "\"Foo Bar\""}, "title=%22Foo+Bar%22&key=test-key&signature=b313169e84c3922f07c6010e2191486a5192c039"]
-     *           [{"artist": "Amélie"}, "artist=Am%C3%A9lie&key=test-key&signature=6fdb17738b2fcb841105585fa02c8052075c3d89"]
-     */
-    public function test_it_correctly_url_encodes_search_query(array $query, string $expected)
+    #[TestWith([['title' => "\"Foo Bar\""], 'title=%22Foo+Bar%22&key=test-key&signature=b313169e84c3922f07c6010e2191486a5192c039'])]
+    #[TestWith([['artist' => 'Amélie'], 'artist=Am%C3%A9lie&key=test-key&signature=6fdb17738b2fcb841105585fa02c8052075c3d89'])]
+    public function test_it_correctly_url_encodes_search_query(array $query, string $expected): void
     {
         $this->mockGuzzleWithEmptySuccessResponse();
         $subject = $this->newSubjectWithValidCredentials();
@@ -143,12 +137,10 @@ class FestivalsApiClientTest extends TestCase
         $this->assertEquals($expected, $result->getUrl());
     }
 
-    /**
-     * @testWith [{}, 0]
-     *           [{"x-total-results": 1021}, 1021]
-     *           [{"x-total-results": 0}, 0]
-     */
-    public function test_event_search_result_holds_total_result_count_from_header(array $headers, int $expected)
+    #[TestWith([[], 0])]
+    #[TestWith([['x-total-results' => 1021], 1021])]
+    #[TestWith([['x-total-results' => 0], 0])]
+    public function test_event_search_result_holds_total_result_count_from_header(array $headers, int $expected): void
     {
         $this->mockGuzzleWithResponse(new Response(200, $headers, "[]"));
         $subject = $this->newSubjectWithValidCredentials();
@@ -156,7 +148,7 @@ class FestivalsApiClientTest extends TestCase
         $this->assertEquals($expected, $result->getTotalResults());
     }
 
-    public function test_search_event_returns_events_from_response()
+    public function test_search_event_returns_events_from_response(): void
     {
         $this->mockGuzzleWithResponse(
             new Response(
@@ -176,16 +168,14 @@ class FestivalsApiClientTest extends TestCase
         );
     }
 
-    /**
-     * @testWith [200, "<p>HTML</p>", "API responded with invalid JSON"]
-     *           [200, "", "API responded with invalid JSON"]
-     *           [404, "{\"error\":\"Event not found\"}", "Event not found"]
-     *           [404, "{\"msg\":\"No error key\"}", "{\"msg\":\"No error key\"}"]
-     *           [403, "Forbidden", "Forbidden"]
-     *           [500, "Server Error", "Server Error"]
-     *           [501, "<h1>Not Implemented</h1>", "<h1>Not Implemented</h1>"]
-     */
-    public function test_it_throws_if_api_responds_with_error(int $code, string $body, string $exception_message)
+    #[TestWith([200, '<p>HTML</p>', 'API responded with invalid JSON'])]
+    #[TestWith([200, '', 'API responded with invalid JSON'])]
+    #[TestWith([404, '{"error":"Event not found"}', 'Event not found'])]
+    #[TestWith([404, '{"msg":"No error key"}', '{"msg":"No error key"}'])]
+    #[TestWith([403, 'Forbidden', 'Forbidden'])]
+    #[TestWith([500, 'Server Error', 'Server Error'])]
+    #[TestWith([501, '<h1>Not Implemented</h1>', '<h1>Not Implemented</h1>'])]
+    public function test_it_throws_if_api_responds_with_error(int $code, string $body, string $exception_message): void
     {
         $this->mockGuzzleWithResponse(new Response($code, [], $body));
         $subject = $this->newSubjectWithValidCredentials();
@@ -195,7 +185,7 @@ class FestivalsApiClientTest extends TestCase
         $subject->loadEvent('1234');
     }
 
-    public function test_client_exception_contains_url_requested()
+    public function test_client_exception_contains_url_requested(): void
     {
         $this->mockGuzzleWithResponse(new Response(404, [], '{"error":"Something went wrong"}'));
         $subject = $this->newSubjectWithValidCredentials();
@@ -210,17 +200,17 @@ class FestivalsApiClientTest extends TestCase
         }
     }
 
-    protected function mockGuzzleWithEmptySuccessResponse()
+    protected function mockGuzzleWithEmptySuccessResponse(): void
     {
         $this->mockGuzzleWithResponses([new Response(200, [], "[]")]);
     }
 
-    protected function mockGuzzleWithResponse(Response $response)
+    protected function mockGuzzleWithResponse(Response $response): void
     {
         $this->mockGuzzleWithResponses([$response]);
     }
 
-    protected function mockGuzzleWithResponses(array $responses)
+    protected function mockGuzzleWithResponses(array $responses): void
     {
         $mock    = new MockHandler($responses);
         $handler = HandlerStack::create($mock);
