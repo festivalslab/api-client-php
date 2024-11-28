@@ -33,7 +33,8 @@ class FestivalsApiClientTest extends TestCase
 
     #[TestWith(['loadEvent', 1234])]
     #[TestWith(['searchEvents', ['title' => 'Foo']])]
-    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials(string $method, $args): void
+    #[TestWith(['searchVenues', ['name' => 'Theatre']])]
+    public function test_it_throws_if_you_attempt_to_use_it_without_setting_credentials(string $method, mixed $args): void
     {
         $subject = $this->newSubject();
         $this->expectException(FestivalsApiClientException::class);
@@ -41,16 +42,15 @@ class FestivalsApiClientTest extends TestCase
         $subject->$method($args);
     }
 
-    public function test_it_performs_requests_with_initialised_key_and_secret(): void
+    #[TestWith(['searchEvents', 'key=mykey&signature=9c638d91ba50f39da6ecc1d4e8846ae30c318f55'])]
+    #[TestWith(['searchVenues', 'key=mykey&signature=71a425569de5646f9d42d73d1f1ba524fe5e9051'])]
+    public function test_it_performs_requests_with_initialised_key_and_secret(string $method, string $expect): void
     {
         $this->mockGuzzleWithEmptySuccessResponse();
         $subject = $this->newSubject();
         $subject->setCredentials('mykey', 'mysecret');
-        $subject->searchEvents([]);
-        $this->assertSame(
-            'key=mykey&signature=9c638d91ba50f39da6ecc1d4e8846ae30c318f55',
-            $this->getRequest(0)->getUri()->getQuery()
-        );
+        $subject->$method([]);
+        $this->assertSame($expect, $this->getRequest(0)->getUri()->getQuery());
     }
 
     public static function provider_constructor_base_urls(): array
@@ -105,20 +105,20 @@ class FestivalsApiClientTest extends TestCase
         $result = $subject->loadEvent('1234');
 
         // calls the API only once
-        $this->assertEquals(1, count($this->history));
+        $this->assertSame(1, count($this->history));
 
         $expected = 'https://api.edinburghfestivalcity.com/events/1234?key=test-key&signature=93604dba44ed6a988bb6b25f480c66f1d7978ec1';
         // it calls the API correctly
-        $this->assertEquals($expected, (string) $this->getRequest(0)->getUri());
+        $this->assertSame($expected, (string) $this->getRequest(0)->getUri());
         //it records the same url in the result object
-        $this->assertEquals($expected, $result->getUrl());
+        $this->assertSame($expected, $result->getUrl());
     }
 
     public function test_load_event_returns_single_event_from_response(): void
     {
         $this->mockGuzzleWithResponse(new Response(200, [], '{"title": "Foo Bar", "id":4321}'));
         $subject = $this->newSubjectWithValidCredentials();
-        $this->assertEquals($subject->loadEvent('4321')->getEvent(), ['title' => 'Foo Bar', 'id' => 4321]);
+        $this->assertSame($subject->loadEvent('4321')->getEvent(), ['title' => 'Foo Bar', 'id' => 4321]);
     }
 
     #[TestWith([['title' => "\"Foo Bar\""], 'title=%22Foo+Bar%22&key=test-key&signature=b313169e84c3922f07c6010e2191486a5192c039'])]
@@ -132,9 +132,9 @@ class FestivalsApiClientTest extends TestCase
 
         $expected = 'https://api.edinburghfestivalcity.com/events?'.$expected;
         //it queries the API with the correct URL
-        $this->assertEquals($expected, (string) $this->getRequest(0)->getUri());
+        $this->assertSame($expected, (string) $this->getRequest(0)->getUri());
         //it records the same url in the result object
-        $this->assertEquals($expected, $result->getUrl());
+        $this->assertSame($expected, $result->getUrl());
     }
 
     #[TestWith([[], 0])]
@@ -145,7 +145,7 @@ class FestivalsApiClientTest extends TestCase
         $this->mockGuzzleWithResponse(new Response(200, $headers, "[]"));
         $subject = $this->newSubjectWithValidCredentials();
         $result  = $subject->searchEvents([]);
-        $this->assertEquals($expected, $result->getTotalResults());
+        $this->assertSame($expected, $result->getTotalResults());
     }
 
     public function test_search_event_returns_events_from_response(): void
@@ -159,11 +159,31 @@ class FestivalsApiClientTest extends TestCase
         );
 
         $subject = $this->newSubjectWithValidCredentials();
-        $this->assertEquals(
+        $this->assertSame(
             $subject->searchEvents(['title' => 'Test'])->getEvents(),
             [
                 ['title' => 'Test event 1', 'id' => 101],
                 ['title' => 'Test event 2', 'id' => 102],
+            ]
+        );
+    }
+
+    public function test_search_venue_returns_events_from_response(): void
+    {
+        $this->mockGuzzleWithResponse(
+            new Response(
+                200,
+                [],
+                '[{"name": "Theatre", "id":101},{"name": "Studio", "id":102}]'
+            )
+        );
+
+        $subject = $this->newSubjectWithValidCredentials();
+        $this->assertSame(
+            $subject->searchVenues(['title' => 'Test'])->getVenues(),
+            [
+                ['name' => 'Theatre', 'id' => 101],
+                ['name' => 'Studio', 'id' => 102],
             ]
         );
     }
@@ -192,8 +212,8 @@ class FestivalsApiClientTest extends TestCase
         try {
             $subject->searchEvents([]);
         } catch (FestivalsApiClientException $e) {
-            $this->assertEquals('Something went wrong', $e->getMessage());
-            $this->assertEquals(
+            $this->assertSame('Something went wrong', $e->getMessage());
+            $this->assertSame(
                 "https://api.edinburghfestivalcity.com/events?key=test-key&signature=7793ae3038669f76de954f197f1818727a12a037",
                 $e->getUrl()
             );

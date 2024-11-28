@@ -1,5 +1,10 @@
 ### Unreleased
 
+### v2.3.0 (2024-11-28)
+
+* Add support for venue search endpoint
+* Remove CI config from export package
+
 ### v2.2.0 (2024-10-01)
 
 * Support PHP 8.3
