@@ -10,17 +10,20 @@ namespace FestivalsApi;
 
 use FestivalsApi\Result\EventSearchResult;
 use FestivalsApi\Result\SingleEventResult;
+use FestivalsApi\Result\VenueSearchResult;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use function http_build_query;
 
 class FestivalsApiClient
 {
     const BASE_URL        = 'https://api.edinburghfestivalcity.com';
     const EVENTS_ENDPOINT = '/events';
+    const VENUES_ENDPOINT = '/venues';
 
     protected string $access_key;
 
@@ -72,6 +75,32 @@ class FestivalsApiClient
 
         return new EventSearchResult($events, (string) $request->getUri(), $total_results);
     }
+
+    /**
+     * Search API for venues matching query
+     *
+     * @throws FestivalsApiClientException
+     * @throws GuzzleException
+     */
+    public function searchVenues(array $query): VenueSearchResult
+    {
+        $this->throwEmptyCredentials();
+
+        $url = self::VENUES_ENDPOINT;
+        if ( ! empty($query)) {
+            $url .= '?'.http_build_query($query);
+        }
+
+        $request  = $this->createRequest($url);
+        $response = $this->sendRequest($request);
+
+        return new VenueSearchResult(
+            venues: $this->decodeJsonResponse($response),
+            url: $request->getUri(),
+            total_results: (int) $response->getHeaderLine('x-total-results') ?: 0
+        );
+    }
+
 
     public function setBaseUrl(string $base_url): void
     {
