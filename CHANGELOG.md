@@ -1,5 +1,9 @@
 ### Unreleased
 
+### v2.4.0 (2025-03-16)
+
+* Support PHP 8.4
+
 ### v2.3.0 (2024-11-28)
 
 * Add support for venue search endpoint
