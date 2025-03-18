@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Utils;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use function http_build_query;
@@ -123,7 +124,7 @@ class FestivalsApiClient
     protected function decodeJsonResponse(ResponseInterface $response): array
     {
         try {
-            return \GuzzleHttp\json_decode((string) $response->getBody(), TRUE);
+            return Utils::jsonDecode((string) $response->getBody(), TRUE);
         } catch (InvalidArgumentException $e) {
             throw FestivalsApiClientException::invalidJsonResponse($response->getStatusCode(), $e);
         }
@@ -160,7 +161,7 @@ class FestivalsApiClient
         $url  = (string) $e->getRequest()->getUri();
 
         try {
-            $decoded = \GuzzleHttp\json_decode($e->getResponse()->getBody(), TRUE);
+            $decoded = Utils::jsonDecode($e->getResponse()->getBody(), TRUE);
             if (isset($decoded['error'])) {
                 $msg = $decoded['error'];
             }
