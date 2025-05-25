@@ -12,12 +12,12 @@
   ],
   "require": {
     "guzzlehttp/guzzle": "^7.9.2",
-    "guzzlehttp/promises": "^2.0.4",
     "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5.45 || ^11.5 || ^12.0",
-    "ergebnis/phpunit-slow-test-detector": "^2.19"
+  	"guzzlehttp/promises": ">=2.0.4",
+    "phpunit/phpunit": "^10.5.45",
+    "ergebnis/phpunit-slow-test-detector": "^2.19.1"
   },
   "support": {
     "source": "https://github.com/festivalslab/api-client-php",
