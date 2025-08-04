@@ -1,5 +1,9 @@
 ### Unreleased
 
+### v2.5.0 (2025-08-05)
+
+* Add VenueSearchIterator to make querying venues endpoint easier
+
 ### v2.4.0 (2025-05-27)
 
 * Support PHP 8.4

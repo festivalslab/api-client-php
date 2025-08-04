@@ -9,6 +9,7 @@ namespace FestivalsApi;
 use Exception;
 use FestivalsApi\Result\EventSearchResult;
 use FestivalsApi\Result\SingleEventResult;
+use FestivalsApi\Result\VenueSearchResult;
 use PHPUnit\Framework\Assert;
 use function array_pop;
 use function array_reverse;
@@ -65,6 +66,14 @@ class MockFestivalsApiClient extends FestivalsApiClient
         $response            = array_pop($this->responses) ?: [];
 
         return new EventSearchResult($response, 'WORK IT OUT YOURSELF', $this->total_results);
+    }
+
+    public function searchVenues(array $query): VenueSearchResult
+    {
+        $this->called_with[] = $query;
+        $response            = array_pop($this->responses) ?: [];
+
+        return new VenueSearchResult($response, 'WORK IT OUT YOURSELF', $this->total_results);
     }
 
 }
