@@ -8,27 +8,10 @@
 namespace FestivalsApi\Result;
 
 
-class VenueSearchResult
+class VenueSearchResult extends AbstractSearchResult
 {
-    public function __construct(
-        protected array  $venues,
-        protected string $url,
-        protected int    $total_results
-    ) {
-    }
-
     public function getVenues(): array
     {
-        return $this->venues;
-    }
-
-    public function getTotalResults(): int
-    {
-        return $this->total_results;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
+        return $this->results;
     }
 }

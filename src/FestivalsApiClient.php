@@ -96,7 +96,7 @@ class FestivalsApiClient
         $response = $this->sendRequest($request);
 
         return new VenueSearchResult(
-            venues: $this->decodeJsonResponse($response),
+            results: $this->decodeJsonResponse($response),
             url: $request->getUri(),
             total_results: (int) $response->getHeaderLine('x-total-results') ?: 0
         );

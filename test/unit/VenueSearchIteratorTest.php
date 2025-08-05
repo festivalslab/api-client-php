@@ -7,19 +7,20 @@
 namespace test\unit\FestivalsApi;
 
 use FestivalsApi\AbstractSearchIterator;
-use FestivalsApi\EventSearchIterator;
+use FestivalsApi\VenueSearchIterator;
 
-class EventSearchIteratorTest extends AbstractSearchIteratorCases
+class VenueSearchIteratorTest extends AbstractSearchIteratorCases
 {
+
     public function test_it_is_initialisable(): void
     {
-        $this->assertInstanceOf(EventSearchIterator::class, $this->newSubject());
+        $this->assertInstanceOf(VenueSearchIterator::class, $this->newSubject());
         $this->assertInstanceOf(AbstractSearchIterator::class, $this->newSubject());
     }
 
-    protected function newSubject(): EventSearchIterator
+    protected function newSubject(): VenueSearchIterator
     {
-        return new EventSearchIterator($this->client);
+        return new VenueSearchIterator($this->client);
     }
 
 }
