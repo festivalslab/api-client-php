@@ -7,13 +7,15 @@
          failOnNotice="true"
          failOnWarning="true"
          failOnRisky="true"
+         failOnPhpunitDeprecation="true"
+         failOnPhpunitNotice="true"
          displayDetailsOnIncompleteTests="true"
          displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.4/phpunit.xsd">
     <testsuites>
         <testsuite name="unit">
             <directory>test/unit</directory>
