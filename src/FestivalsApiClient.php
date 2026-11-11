@@ -15,10 +15,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Utils;
-use InvalidArgumentException;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
 use function http_build_query;
+use function json_decode;
+use const JSON_THROW_ON_ERROR;
 
 class FestivalsApiClient
 {
@@ -124,8 +125,13 @@ class FestivalsApiClient
     protected function decodeJsonResponse(ResponseInterface $response): array
     {
         try {
-            return Utils::jsonDecode((string) $response->getBody(), TRUE);
-        } catch (InvalidArgumentException $e) {
+            $data = json_decode((string) $response->getBody(), TRUE, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($data)) {
+                throw new JsonException('Decoded JSON is not an array');
+            }
+
+            return $data;
+        } catch (JsonException $e) {
             throw FestivalsApiClientException::invalidJsonResponse($response->getStatusCode(), $e);
         }
     }
@@ -156,16 +162,16 @@ class FestivalsApiClient
      */
     protected function handleApiError(BadResponseException $e): void
     {
-        $msg  = $e->getResponse()->getBody();
+        $msg  = (string) $e->getResponse()->getBody();
         $code = $e->getResponse()->getStatusCode();
         $url  = (string) $e->getRequest()->getUri();
 
         try {
-            $decoded = Utils::jsonDecode($e->getResponse()->getBody(), TRUE);
+            $decoded = json_decode((string) $e->getResponse()->getBody(), TRUE, 512, JSON_THROW_ON_ERROR);
             if (isset($decoded['error'])) {
                 $msg = $decoded['error'];
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (JsonException) {
 
         }
 
