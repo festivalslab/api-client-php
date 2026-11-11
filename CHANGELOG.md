@@ -1,6 +1,10 @@
 ### Unreleased
 
+### v2.6.0 (2026-11-18)
+
+* Require Guzzle > 7.16 for PHP 8.6 and support Guzzle 8
 * Support PHP 8.5 and PHP 8.6
+* Drop support for < PHP 8.4
 
 ### v2.5.0 (2025-08-05)
 
