@@ -138,8 +138,8 @@ class FestivalsApiClientTest extends TestCase
     }
 
     #[TestWith([[], 0])]
-    #[TestWith([['x-total-results' => 1021], 1021])]
-    #[TestWith([['x-total-results' => 0], 0])]
+    #[TestWith([['x-total-results' => '1021'], 1021])]
+    #[TestWith([['x-total-results' => '0'], 0])]
     public function test_event_search_result_holds_total_result_count_from_header(array $headers, int $expected): void
     {
         $this->mockGuzzleWithResponse(new Response(200, $headers, "[]"));
