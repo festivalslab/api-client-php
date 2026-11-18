@@ -11,11 +11,10 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "^7.9.2 || ^8.3",
+    "guzzlehttp/guzzle": "^7.16 || ^8.3",
     "php": ">=8.4 <8.7"
   },
   "require-dev": {
-    "guzzlehttp/promises": ">=2.0.4",
     "phpunit/phpunit": "^13.4",
     "ergebnis/phpunit-slow-test-detector": "^2.19.1"
   },
